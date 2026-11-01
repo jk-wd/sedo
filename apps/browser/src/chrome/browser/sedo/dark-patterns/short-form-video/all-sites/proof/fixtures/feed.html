@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Video feed</title>
+    <style>
+      body { margin: 0; font-family: sans-serif; }
+      header { height: 48px; background: #ddd; }
+      main { display: flex; flex-wrap: wrap; gap: 16px; padding: 16px; }
+      video { display: block; background: #345; }
+      #scroller { width: 220px; height: 200px; overflow: auto; }
+      #scroller .spacer { height: 120px; }
+    </style>
+  </head>
+  <body>
+    <header id="masthead">Site header</header>
+    <main>
+      <video id="vertical-short" width="180" height="320" muted></video>
+      <video id="landscape-short" width="320" height="180"></video>
+      <video id="vertical-long" width="180" height="320"></video>
+      <video id="square-short" width="200" height="200"></video>
+      <video id="vertical-live" width="180" height="320"></video>
+      <video id="camera" width="180" height="320" muted playsinline></video>
+      <video id="unloaded" width="180" height="320"></video>
+      <div id="host"></div>
+      <div id="scroller">
+        <div class="spacer"></div>
+        <video id="scrolled-short" width="180" height="320"></video>
+      </div>
+      <p id="caption">Caption under the feed</p>
+    </main>
+    <script>
+      // A fixture has no media files. This stands in for the browser loading
+      // a video's size and length.
+      window.setMetadata = (video, width, height, duration) => {
+        const values = { readyState: 1, videoWidth: width, videoHeight: height, duration };
+        for (const [name, value] of Object.entries(values)) {
+          Object.defineProperty(video, name, { configurable: true, get: () => value });
+        }
+        video.dispatchEvent(new Event('loadedmetadata'));
+      };
+    </script>
+  </body>
+</html>

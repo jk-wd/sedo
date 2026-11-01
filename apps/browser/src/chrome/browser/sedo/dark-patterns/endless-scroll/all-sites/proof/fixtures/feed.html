@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Feed</title>
+    <style>
+      body { margin: 0; font-family: sans-serif; }
+      header { height: 48px; background: #ddd; }
+      .item { height: 300px; margin: 0 16px 16px; background: #c7d2df; }
+      .tick { height: 60px; margin: 0 16px 8px; background: #e5e5e5; }
+      p { height: 120px; margin: 0 16px 16px; }
+      #scroller { height: 700px; overflow: auto; }
+      #panel {
+        position: fixed; right: 16px; top: 64px; width: 240px; height: 240px;
+        overflow: auto; background: #fff; border: 2px solid #141414;
+      }
+      #panel div { height: 1200px; }
+      #more { display: block; margin: 16px; }
+    </style>
+  </head>
+  <body>
+    <header id="masthead">Site header</header>
+    <main id="main"></main>
+    <script>
+      // ?mode=window (default), inner, button, static, ticker,
+      // prefetch, prefetch-cold, prefetch-xhr, same-url, fetch-button.
+      const mode = new URLSearchParams(location.search).get('mode') || 'window';
+      const main = document.getElementById('main');
+      const append = (list, count, className = 'item') => {
+        for (let i = 0; i < count; i += 1) {
+          const item = document.createElement('article');
+          item.className = className;
+          item.textContent = `${className} ${list.children.length + 1}`;
+          list.append(item);
+        }
+      };
+      const feed = document.createElement('section');
+      feed.id = 'feed';
+
+      if (mode === 'static') {
+        for (let i = 0; i < 40; i += 1) {
+          const p = document.createElement('p');
+          p.textContent = `Paragraph ${i + 1}`;
+          main.append(p);
+        }
+      } else if (mode === 'inner') {
+        const scroller = document.createElement('div');
+        scroller.id = 'scroller';
+        scroller.append(feed);
+        main.append(scroller);
+        append(feed, 8);
+        let loading = false;
+        scroller.addEventListener('scroll', () => {
+          const remaining = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight;
+          if (remaining > 600 || loading) return;
+          loading = true;
+          setTimeout(() => { append(feed, 10); loading = false; }, 80);
+        }, { passive: true });
+      } else if (
+        mode === 'prefetch' || mode === 'prefetch-cold' || mode === 'prefetch-xhr'
+        || mode === 'same-url' || mode === 'fetch-button'
+      ) {
+        // The next page is fetched while more than 2 screens remain, which is
+        // outside the near-end rule. Each page changes the query, except same-url.
+        main.append(feed);
+        append(feed, 20);
+        let pageNum = 1;
+        let loading = false;
+        const request = (url, done) => {
+          if (mode === 'prefetch-xhr') {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', url);
+            xhr.onload = () => done();
+            xhr.send();
+            return;
+          }
+          fetch(url).finally(done);
+        };
+        const grow = () => append(feed, 10);
+        const onScroll = () => {
+          const root = document.scrollingElement;
+          const remaining = root.scrollHeight - root.scrollTop - root.clientHeight;
+          const height = root.clientHeight;
+          if (remaining > height * 4.5 || remaining <= height * 2 || loading) return;
+          loading = true;
+          pageNum += 1;
+          const next = mode === 'same-url' ? 2 : pageNum;
+          request(`/napi/photos?page=${next}`, () => {
+            grow();
+            loading = false;
+          });
+        };
+        const arm = () => {
+          if (mode === 'fetch-button') {
+            const more = document.createElement('button');
+            more.id = 'more';
+            more.textContent = 'Load more';
+            more.addEventListener('click', () => {
+              pageNum += 1;
+              request(`/napi/photos?page=${pageNum}`, grow);
+            });
+            main.append(more);
+            return;
+          }
+          addEventListener('scroll', onScroll, { passive: true });
+        };
+        if (mode === 'prefetch-cold') arm();
+        else request(mode === 'same-url' ? '/napi/photos?page=2' : '/napi/photos?page=1', arm);
+      } else {
+        main.append(feed);
+        append(feed, 12);
+        if (mode === 'button') {
+          const more = document.createElement('button');
+          more.id = 'more';
+          more.textContent = 'Load more';
+          more.addEventListener('click', () => append(feed, 10));
+          main.append(more);
+        } else if (mode === 'ticker') {
+          setInterval(() => append(feed, 1, 'tick'), 1000);
+        } else {
+          const panel = document.createElement('div');
+          panel.id = 'panel';
+          panel.append(document.createElement('div'));
+          document.body.append(panel);
+          let loading = false;
+          addEventListener('scroll', () => {
+            const root = document.scrollingElement;
+            const remaining = root.scrollHeight - root.scrollTop - root.clientHeight;
+            if (remaining > 600 || loading) return;
+            loading = true;
+            setTimeout(() => { append(feed, 10); loading = false; }, 80);
+          }, { passive: true });
+        }
+      }
+    </script>
+  </body>
+</html>

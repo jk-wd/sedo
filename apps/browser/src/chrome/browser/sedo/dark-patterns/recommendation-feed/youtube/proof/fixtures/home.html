@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>YouTube home fixture</title>
+  <style>
+    body * { display: block; min-height: 1px; }
+    input { display: inline-block; min-width: 8px; }
+  </style>
+</head>
+<body>
+  <div id="masthead">Masthead<input id="search" value="search"></div>
+  <ytd-searchbox id="searchbox">Search</ytd-searchbox>
+  <ytd-mini-guide-renderer id="mini-guide">Mini guide</ytd-mini-guide-renderer>
+  <ytd-guide-renderer id="guide">Guide</ytd-guide-renderer>
+  <ytd-browse page-subtype="home">
+    <div id="primary">
+      <ytd-rich-grid-renderer id="home-grid">Home grid</ytd-rich-grid-renderer>
+      <ytd-rich-shelf-renderer id="home-shelf">Shelf</ytd-rich-shelf-renderer>
+      <ytd-rich-section-renderer id="home-section">Section</ytd-rich-section-renderer>
+      <ytd-reel-shelf-renderer id="home-reels">Shorts</ytd-reel-shelf-renderer>
+      <ytd-rich-item-renderer id="home-item">Home item</ytd-rich-item-renderer>
+      <yt-lockup-view-model id="home-lockup">Lockup</yt-lockup-view-model>
+      <ytd-continuation-item-renderer id="home-continuation">More</ytd-continuation-item-renderer>
+    </div>
+  </ytd-browse>
+</body>
+</html>

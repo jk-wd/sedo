@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>YouTube watch fixture</title>
+  <style>
+    body * { display: block; min-height: 1px; }
+    input { display: inline-block; min-width: 8px; }
+  </style>
+</head>
+<body>
+  <div id="masthead">Masthead<input id="search" value="search"></div>
+  <ytd-searchbox id="searchbox">Search</ytd-searchbox>
+  <div id="primary">
+    <ytd-player id="player">
+      <div id="movie_player">Player</div>
+    </ytd-player>
+    <ytd-watch-metadata id="metadata">Title</ytd-watch-metadata>
+    <ytd-comments id="comments">Comments</ytd-comments>
+  </div>
+  <div id="secondary">
+    <ytd-playlist-panel-renderer id="queue">
+      Queue
+      <ytd-compact-video-renderer id="queue-item">Now playing</ytd-compact-video-renderer>
+    </ytd-playlist-panel-renderer>
+    <ytd-watch-next-secondary-results-renderer id="related">
+      Related
+      <ytd-compact-video-renderer id="related-video">Suggested</ytd-compact-video-renderer>
+    </ytd-watch-next-secondary-results-renderer>
+    <yt-lockup-view-model id="related-lockup">Lockup</yt-lockup-view-model>
+    <ytd-compact-video-renderer id="secondary-compact">Compact</ytd-compact-video-renderer>
+    <ytd-compact-radio-renderer id="related-radio">Mix</ytd-compact-radio-renderer>
+    <ytd-compact-playlist-renderer id="related-playlist">Playlist</ytd-compact-playlist-renderer>
+    <ytd-compact-autoplay-renderer id="related-autoplay">Autoplay</ytd-compact-autoplay-renderer>
+    <yt-related-chip-cloud-renderer id="related-chips">Chips</yt-related-chip-cloud-renderer>
+    <ytd-continuation-item-renderer id="related-more">More</ytd-continuation-item-renderer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "kind": "inbase-wrapper",
+  "name": "wellbeing-browser-1",
+  "savedAt": "2026-10-27T07:02:13.198Z",
+  "blueprints": [
+    {
+      "color": "blue",
+      "file": "wellbeing-browser-1.blueprint.json",
+      "hidden": false,
+      "dependsOn": []
+    }
+  ]
+}

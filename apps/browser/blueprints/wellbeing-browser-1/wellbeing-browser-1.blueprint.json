@@ -1,0 +1,160 @@
+{
+  "version": 1,
+  "kind": "blueprint",
+  "name": "wellbeing-browser-1",
+  "files": [
+    {
+      "id": "src/chrome/browser/sedo/feed_blocker.cc",
+      "name": "feed_blocker.cc",
+      "path": "src/chrome/browser/sedo/feed_blocker.cc",
+      "folder": "src/chrome/browser/sedo"
+    },
+    {
+      "id": "patches/extra/sedo/hook-feed-blocker.patch",
+      "name": "hook-feed-blocker.patch",
+      "path": "patches/extra/sedo/hook-feed-blocker.patch",
+      "folder": "patches/extra/sedo"
+    }
+  ],
+  "folders": [
+    {
+      "id": "patches",
+      "name": "patches",
+      "path": "patches",
+      "parent": "."
+    },
+    {
+      "id": "patches/extra",
+      "name": "extra",
+      "path": "patches/extra",
+      "parent": "patches"
+    },
+    {
+      "id": "patches/extra/sedo",
+      "name": "sedo",
+      "path": "patches/extra/sedo",
+      "parent": "patches/extra"
+    },
+    {
+      "id": "src",
+      "name": "src",
+      "path": "src",
+      "parent": "."
+    },
+    {
+      "id": "src/chrome",
+      "name": "chrome",
+      "path": "src/chrome",
+      "parent": "src"
+    },
+    {
+      "id": "src/chrome/browser",
+      "name": "browser",
+      "path": "src/chrome/browser",
+      "parent": "src/chrome"
+    },
+    {
+      "id": "src/chrome/browser/sedo",
+      "name": "sedo",
+      "path": "src/chrome/browser/sedo",
+      "parent": "src/chrome/browser"
+    }
+  ],
+  "functions": [
+    {
+      "name": "BlockFeed",
+      "file": "src/chrome/browser/sedo/feed_blocker.cc"
+    },
+    {
+      "name": "MatchesFeed",
+      "file": "src/chrome/browser/sedo/feed_blocker.cc"
+    },
+    {
+      "name": "OnDomUpdated",
+      "file": "patches/extra/sedo/hook-feed-blocker.patch"
+    }
+  ],
+  "classes": [],
+  "variables": [
+    {
+      "name": "kYouTubeHosts",
+      "file": "src/chrome/browser/sedo/feed_blocker.cc"
+    },
+    {
+      "name": "kFeedSelectors",
+      "file": "src/chrome/browser/sedo/feed_blocker.cc"
+    },
+    {
+      "name": "kProtectedSelectors",
+      "file": "src/chrome/browser/sedo/feed_blocker.cc"
+    }
+  ],
+  "imports": [
+    {
+      "name": "FeedBlocker",
+      "from": "src/chrome/browser/sedo/feed_blocker.cc",
+      "file": "patches/extra/sedo/hook-feed-blocker.patch"
+    }
+  ],
+  "notes": [
+    {
+      "file": "patches/extra/sedo",
+      "kind": "folder",
+      "note": "Proof of concept. This repo is a public fork of ungoogled-software/ungoogled-chromium, not a wrapper and not an extension. Our change is a GNU Quilt patch series compiled into the browser. Chromium source is downloaded at build time. extra/ patches can break on the next Chromium update. Building the browser needs depot_tools, a large checkout, and a long compile."
+    },
+    {
+      "file": "src/chrome/browser/sedo/feed_blocker.cc",
+      "kind": "file",
+      "note": "Feed-blocker policy, compiled into the browser from src/. BSD-3-Clause, with a copyright line for this project. Keep the upstream LICENSE and copyright notices. Do not use the Chrome trademark or re-enable Google telemetry. The build copies this tree into Chromium before compile."
+    },
+    {
+      "file": "src/chrome/browser/sedo/feed_blocker.cc",
+      "kind": "function",
+      "name": "MatchesFeed",
+      "note": "True only for a recommended-video sidebar, discovery grid, or infinite-scroll continuation. False for the search box, masthead, player, primary navigation, and the video the user opened."
+    },
+    {
+      "file": "src/chrome/browser/sedo/feed_blocker.cc",
+      "kind": "function",
+      "name": "BlockFeed",
+      "note": "Remove matched nodes before they paint. Do not cancel search, history navigation, or playback of the opened video."
+    },
+    {
+      "file": "src/chrome/browser/sedo/feed_blocker.cc",
+      "kind": "variable",
+      "name": "kYouTubeHosts",
+      "note": "YouTube host patterns only. Other platforms stay out of this proof of concept."
+    },
+    {
+      "file": "src/chrome/browser/sedo/feed_blocker.cc",
+      "kind": "variable",
+      "name": "kFeedSelectors",
+      "note": "Recommendation sidebar, related and end-screen grids, and the infinite-scroll continuation."
+    },
+    {
+      "file": "src/chrome/browser/sedo/feed_blocker.cc",
+      "kind": "variable",
+      "name": "kProtectedSelectors",
+      "note": "Search, masthead, player, and primary navigation. These stay even when they sit next to a recommendation region."
+    },
+    {
+      "file": "patches/extra/sedo/hook-feed-blocker.patch",
+      "kind": "file",
+      "note": "Unified diff that registers the feed-blocker sources and runs the agent at document start. The agent C++ lives in src/chrome/renderer/sedo and is copied in at build time. Register this patch in patches/series."
+    },
+    {
+      "file": "patches/extra/sedo/hook-feed-blocker.patch",
+      "kind": "function",
+      "name": "OnDomUpdated",
+      "note": "Call FeedBlocker again when infinite scroll inserts nodes."
+    }
+  ],
+  "pointers": [],
+  "deleted": [],
+  "steps": [
+    "Fork ungoogled-software/ungoogled-chromium into this repo and keep the fork open source",
+    "Keep the feed-blocker C++ in src/ and the renderer hook under patches/extra/sedo",
+    "Register hook-feed-blocker.patch in patches/series",
+    "Build the browser and block YouTube recommendation surfaces while search and direct navigation stay usable"
+  ]
+}

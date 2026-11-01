@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>YouTube mobile home fixture</title>
+  <style>
+    body * { display: block; min-height: 1px; }
+    input { display: inline-block; min-width: 8px; }
+  </style>
+</head>
+<body>
+  <input id="search" value="search">
+  <ytm-browse id="mobile-browse">
+    <ytm-rich-item-renderer id="m-item">Item</ytm-rich-item-renderer>
+    <ytm-rich-section-renderer id="m-section">Section</ytm-rich-section-renderer>
+    <ytm-reel-shelf-renderer id="m-reels">Shorts</ytm-reel-shelf-renderer>
+    <ytm-video-with-context-renderer id="m-video">Video</ytm-video-with-context-renderer>
+  </ytm-browse>
+</body>
+</html>

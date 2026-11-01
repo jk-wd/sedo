@@ -1,0 +1,27 @@
+{
+  "pattern": "endless-scroll",
+  "site": "all-sites",
+  "strings": {
+    "kCounterLabel": "Scrolled",
+    "kLimitLabel": "Scroll limit reached",
+    "kLabelFontFamily": "Sedo Proxima Nova"
+  },
+  "numbers": {
+    "kDefaultLimit": 3,
+    "kMaxLimit": 5,
+    "kNearEndScreens": 2,
+    "kMinGrowthScreens": 0.5,
+    "kMinScrollerHeight": 200,
+    "kLoadWindowMs": 4000,
+    "kBurstGapMs": 600,
+    "kLoadCooldownMs": 800,
+    "kScrollIntentMs": 600,
+    "kClickGraceMs": 1500,
+    "kRequestIntentMs": 2000,
+    "kRequestGrowthMs": 2000,
+    "kRequestGrowthScreens": 1
+  },
+  "fonts": {
+    "kLabelFont": "label-font.woff2"
+  }
+}

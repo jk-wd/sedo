@@ -1,0 +1,6 @@
+# Sedo. On the full Ungoogled-Chromium fork, keep the upstream series above
+# this line. Feed-blocker sources are copied from src/ before compile.
+extra/sedo/hook-feed-blocker.patch
+extra/sedo/hook-start-page.patch
+extra/sedo/hook-short-form-video.patch
+extra/sedo/hook-endless-scroll.patch

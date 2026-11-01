@@ -1,0 +1,47 @@
+# Wires dark-pattern blockers into the renderer. The C++ lives in src/ under
+# chrome/browser/sedo/dark-patterns/<pattern>/<site>/ and is copied into the
+# Chromium tree at build time. recommendation-feed / youtube is the first.
+# When a Chromium update rejects a hunk, adjust the context lines here.
+diff -ruN a/chrome/renderer/BUILD.gn b/chrome/renderer/BUILD.gn
+--- a/chrome/renderer/BUILD.gn
++++ b/chrome/renderer/BUILD.gn
+@@ -69,6 +69,12 @@
+     "browser_exposed_renderer_interfaces.cc",
+     "browser_exposed_renderer_interfaces.h",
+     "chrome_content_renderer_client.cc",
++    "../browser/sedo/feed_blocker.cc",
++    "../browser/sedo/feed_blocker.h",
++    "../browser/sedo/dark-patterns/recommendation-feed/youtube/youtube_recommendation_feed.cc",
++    "../browser/sedo/dark-patterns/recommendation-feed/youtube/youtube_recommendation_feed.h",
++    "sedo/feed_blocker_agent.cc",
++    "sedo/feed_blocker_agent.h",
+     "chrome_content_renderer_client.h",
+     "chrome_content_settings_agent_delegate.cc",
+     "chrome_content_settings_agent_delegate.h",
+diff -ruN a/chrome/renderer/chrome_content_renderer_client.cc b/chrome/renderer/chrome_content_renderer_client.cc
+--- a/chrome/renderer/chrome_content_renderer_client.cc
++++ b/chrome/renderer/chrome_content_renderer_client.cc
+@@ -57,6 +57,7 @@
+ #include "chrome/renderer/chrome_content_settings_agent_delegate.h"
+ #include "chrome/renderer/chrome_render_frame_observer.h"
+ #include "chrome/renderer/chrome_render_thread_observer.h"
++#include "chrome/renderer/sedo/feed_blocker_agent.h"
+ #include "chrome/renderer/controlled_frame/controlled_frame_extensions_renderer_api_provider.h"
+ #include "chrome/renderer/google_accounts_private_api_extension.h"
+ #include "chrome/renderer/loadtimes_bindings.h"
+@@ -654,6 +655,7 @@
+     content::RenderFrame* render_frame) {
+   ChromeRenderFrameObserver* render_frame_observer =
+       new ChromeRenderFrameObserver(render_frame, web_cache_impl_.get());
++  new sedo::FeedBlockerAgent(render_frame);
+   service_manager::BinderRegistry* registry = render_frame_observer->registry();
+ 
+   new prerender::NoStatePrefetchRenderFrameObserver(render_frame);
+@@ -1487,6 +1489,7 @@
+ void ChromeContentRendererClient::RunScriptsAtDocumentStart(
+     content::RenderFrame* render_frame) {
++  sedo::FeedBlockerAgent::Install(render_frame);
+ #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
+   extensions::ExtensionsRendererClient::Get()->RunScriptsAtDocumentStart(
+       render_frame);
+   // |render_frame| might be dead by now.

@@ -1,0 +1,16 @@
+{
+  "name": "@sedo/browser",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Sedo browser, built from Ungoogled Chromium.",
+  "scripts": {
+    "download": "bash scripts/download-ungoogled-chromium.sh",
+    "build": "bash scripts/build-browser.sh",
+    "open": "open build/ungoogled-chromium-macos/build/src/out/Default/Chromium.app",
+    "proof": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1"
+  }
+}

@@ -1,0 +1,25 @@
+---
+description: Dark-pattern blockers are grouped by pattern and site. A developer logs the agent into a social platform, and the agent only reads.
+alwaysApply: true
+---
+
+# Dark-pattern blockers
+
+Policies live at `apps/browser/src/chrome/browser/sedo/dark-patterns/<pattern>/<site>/`.
+
+`recommendation-feed/youtube` is the YouTube recommendation feed. Read that folder's README before changing it. Prove blocked surfaces with the Playwright tests in its `proof/` folder (`pnpm browser:proof`).
+
+A new site gets its own folder. Register it in `feed_blocker.cc` and in `patches/extra/sedo/hook-feed-blocker.patch`.
+
+## Logged-in social platforms
+
+The developer can log the agent into a social platform so it can see what a blocker still misses. The developer performs the login, including the password and any second factor. The agent does not ask for, type, or store credentials, cookies, or session data.
+
+On that platform the agent only reads. Navigate and look. Find what still needs a blocker change, and do that adjustment with the developer.
+
+- Navigate by opening links and URLs the developer asked for.
+- Do not add friends, follow, subscribe, like, comment, post, share, message, or upload.
+- Do not delete, remove, hide, block, or edit anything, including settings, history, and the account.
+- Do not type into the site.
+
+Report the surfaces that should be blocked and the surfaces that should stay. Wait until the developer agrees before editing a blocker.

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>YouTube search fixture</title>
+  <style>
+    body * { display: block; min-height: 1px; }
+  </style>
+</head>
+<body>
+  <div id="masthead">Masthead</div>
+  <ytd-searchbox id="searchbox">Search</ytd-searchbox>
+  <ytd-browse page-subtype="search">
+    <div id="primary">
+      <ytd-rich-grid-renderer id="search-grid">Search grid</ytd-rich-grid-renderer>
+      <ytd-video-renderer id="search-result">Result</ytd-video-renderer>
+    </div>
+  </ytd-browse>
+</body>
+</html>

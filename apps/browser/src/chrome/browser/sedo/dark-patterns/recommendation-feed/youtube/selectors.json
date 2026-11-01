@@ -1,0 +1,60 @@
+{
+  "pattern": "recommendation-feed",
+  "site": "youtube",
+  "arrays": {
+    "kYouTubeHosts": [
+      "youtube.com",
+      "www.youtube.com",
+      "m.youtube.com"
+    ],
+    "kYouTubeWatchSelectors": [
+      "ytd-watch-next-secondary-results-renderer",
+      "#related"
+    ],
+    "kYouTubeWatchItemSelectors": [
+      "#secondary yt-lockup-view-model",
+      "#secondary ytd-compact-video-renderer",
+      "#secondary ytd-compact-radio-renderer",
+      "#secondary ytd-compact-playlist-renderer",
+      "#secondary ytd-compact-autoplay-renderer",
+      "#secondary yt-related-chip-cloud-renderer",
+      "#secondary ytd-continuation-item-renderer"
+    ],
+    "kYouTubeHomeSelectors": [
+      "ytd-rich-grid-renderer",
+      "ytd-rich-shelf-renderer",
+      "ytd-rich-section-renderer",
+      "ytd-reel-shelf-renderer",
+      "#primary ytd-rich-item-renderer",
+      "#primary yt-lockup-view-model",
+      "#primary ytd-continuation-item-renderer",
+      "ytm-rich-item-renderer",
+      "ytm-rich-section-renderer",
+      "ytm-reel-shelf-renderer",
+      "ytm-video-with-context-renderer"
+    ],
+    "kYouTubeMobileWatchItems": [
+      "ytm-video-with-context-renderer",
+      "ytm-compact-video-renderer",
+      "ytm-rich-item-renderer",
+      "ytm-reel-shelf-renderer"
+    ],
+    "kProtectedSelectors": [
+      "#movie_player",
+      "ytd-player",
+      "ytm-player",
+      "ytd-watch-metadata",
+      "ytd-comments",
+      "ytd-playlist-panel-renderer",
+      "ytd-searchbox",
+      "input#search",
+      "#masthead",
+      "ytd-mini-guide-renderer",
+      "ytd-guide-renderer"
+    ]
+  },
+  "strings": {
+    "kYouTubeMobileWatchRoot": "ytm-single-column-watch-next-results-renderer",
+    "kPlayerSelector": "#movie_player, ytd-player, ytm-player"
+  }
+}

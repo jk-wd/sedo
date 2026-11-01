@@ -1,0 +1,15 @@
+{
+  "pattern": "short-form-video",
+  "site": "all-sites",
+  "strings": {
+    "kBlockedLabel": "Short-form video blocked",
+    "kLabelFontFamily": "Sedo Proxima Nova"
+  },
+  "numbers": {
+    "kMaxDurationSeconds": 180,
+    "kMinPortraitRatio": 1.2
+  },
+  "fonts": {
+    "kLabelFont": "label-font.woff2"
+  }
+}

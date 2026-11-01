@@ -1,0 +1,135 @@
+# Sends the start-page short-form video switch to every renderer and compiles
+# dark-patterns/short-form-video/all-sites/ into the renderer. Applies after
+# hook-feed-blocker.patch. The switch is the profile pref
+# sedo.short_form_video_blocking; RendererUpdater pushes it as DynamicParams.
+# When a Chromium update rejects a hunk, adjust the context lines here.
+diff -ruN a/chrome/browser/chrome_content_browser_client.cc b/chrome/browser/chrome_content_browser_client.cc
+--- a/chrome/browser/chrome_content_browser_client.cc
++++ b/chrome/browser/chrome_content_browser_client.cc
+@@ -172,6 +172,7 @@
+ #include "chrome/browser/renderer_preferences_util.h"
+ #include "chrome/browser/safe_browsing/url_checker_delegate_impl.h"
+ #include "chrome/browser/search/search.h"
++#include "chrome/browser/sedo/sedo_prefs.h"
+ #include "chrome/browser/sensor/chrome_sensor_delegate.h"
+ #include "chrome/browser/serial/chrome_serial_delegate.h"
+ #include "chrome/browser/service_worker/service_worker_prewarm.h"
+@@ -6084,7 +6085,9 @@
+               policy::policy_prefs::kForceGoogleSafeSearch),
+           profile->GetPrefs()->GetInteger(
+               policy::policy_prefs::kForceYouTubeRestrict),
+-          profile->GetPrefs()->GetString(prefs::kAllowedDomainsForApps));
++          profile->GetPrefs()->GetString(prefs::kAllowedDomainsForApps),
++          profile->GetPrefs()->GetBoolean(
++              sedo::prefs::kShortFormVideoBlocking));
+   return std::make_unique<GoogleURLLoaderThrottle>(
+ #if BUILDFLAG(IS_ANDROID)
+       client_data_header,
+diff -ruN a/chrome/browser/prefs/browser_prefs.cc b/chrome/browser/prefs/browser_prefs.cc
+--- a/chrome/browser/prefs/browser_prefs.cc
++++ b/chrome/browser/prefs/browser_prefs.cc
+@@ -79,6 +79,7 @@
+ #include "chrome/browser/rlz/chrome_rlz_tracker_delegate.h"
+ #include "chrome/browser/search/background/ntp_custom_background_service.h"
+ #include "chrome/browser/search/search.h"
++#include "chrome/browser/sedo/sedo_prefs.h"
+ #include "chrome/browser/serial/serial_policy_allowed_ports.h"
+ #include "chrome/browser/sharing_hub/sharing_hub_features.h"
+ #include "chrome/browser/signin/chrome_signin_client.h"
+@@ -1848,6 +1849,7 @@
+ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
+                           const std::string& locale) {
+   TRACE_EVENT0("browser", "chrome::RegisterProfilePrefs");
++  registry->RegisterBooleanPref(sedo::prefs::kShortFormVideoBlocking, true);
+   // User prefs. Please keep this list alphabetized.
+   AccessibilityLabelsService::RegisterProfilePrefs(registry);
+   registry->RegisterBooleanPref(prefs::kRendererAccessibilityEnabled, true);
+diff -ruN a/chrome/browser/profiles/renderer_updater.cc b/chrome/browser/profiles/renderer_updater.cc
+--- a/chrome/browser/profiles/renderer_updater.cc
++++ b/chrome/browser/profiles/renderer_updater.cc
+@@ -13,6 +13,7 @@
+ #include "chrome/browser/content_settings/content_settings_manager_delegate.h"
+ #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
+ #include "chrome/browser/profiles/profile.h"
++#include "chrome/browser/sedo/sedo_prefs.h"
+ #include "chrome/common/pref_names.h"
+ #include "chrome/common/renderer_configuration.mojom.h"
+ #include "components/content_settings/common/content_settings_manager.mojom.h"
+@@ -74,6 +75,8 @@
+   force_youtube_restrict_.Init(policy::policy_prefs::kForceYouTubeRestrict,
+                                pref_service);
+   allowed_domains_for_apps_.Init(prefs::kAllowedDomainsForApps, pref_service);
++  sedo_short_form_video_.Init(sedo::prefs::kShortFormVideoBlocking,
++                              pref_service);
+ 
+   pref_change_registrar_.Init(pref_service);
+   pref_change_registrar_.Add(
+@@ -88,6 +91,10 @@
+       prefs::kAllowedDomainsForApps,
+       base::BindRepeating(&RendererUpdater::UpdateAllRenderers,
+                           base::Unretained(this)));
++  pref_change_registrar_.Add(
++      sedo::prefs::kShortFormVideoBlocking,
++      base::BindRepeating(&RendererUpdater::UpdateAllRenderers,
++                          base::Unretained(this)));
+ }
+ 
+ RendererUpdater::~RendererUpdater() {
+@@ -231,5 +238,6 @@
+       GetBoundSessionThrottlerParams(),
+ #endif
+       force_google_safesearch_.GetValue(), force_youtube_restrict_.GetValue(),
+-      allowed_domains_for_apps_.GetValue());
++      allowed_domains_for_apps_.GetValue(),
++      sedo_short_form_video_.GetValue());
+ }
+diff -ruN a/chrome/browser/profiles/renderer_updater.h b/chrome/browser/profiles/renderer_updater.h
+--- a/chrome/browser/profiles/renderer_updater.h
++++ b/chrome/browser/profiles/renderer_updater.h
+@@ -104,6 +104,7 @@
+   BooleanPrefMember force_google_safesearch_;
+   IntegerPrefMember force_youtube_restrict_;
+   StringPrefMember allowed_domains_for_apps_;
++  BooleanPrefMember sedo_short_form_video_;
+ };
+ 
+ #endif  // CHROME_BROWSER_PROFILES_RENDERER_UPDATER_H_
+diff -ruN a/chrome/common/renderer_configuration.mojom b/chrome/common/renderer_configuration.mojom
+--- a/chrome/common/renderer_configuration.mojom
++++ b/chrome/common/renderer_configuration.mojom
+@@ -30,6 +30,8 @@
+   bool force_safe_search = true;
+   int32 youtube_restrict = 0;
+   string allowed_domains_for_apps;
++  // Sedo start-page switch. True runs the short-form video blocker.
++  bool sedo_short_form_video = true;
+ };
+ 
+ // The renderer configuration parameters are set during the process lock update
+diff -ruN a/chrome/renderer/BUILD.gn b/chrome/renderer/BUILD.gn
+--- a/chrome/renderer/BUILD.gn
++++ b/chrome/renderer/BUILD.gn
+@@ -72,6 +72,8 @@
+     "../browser/sedo/feed_blocker.h",
+     "../browser/sedo/dark-patterns/recommendation-feed/youtube/youtube_recommendation_feed.cc",
+     "../browser/sedo/dark-patterns/recommendation-feed/youtube/youtube_recommendation_feed.h",
++    "../browser/sedo/dark-patterns/short-form-video/all-sites/short_form_video.cc",
++    "../browser/sedo/dark-patterns/short-form-video/all-sites/short_form_video.h",
+     "sedo/feed_blocker_agent.cc",
+     "sedo/feed_blocker_agent.h",
+     "chrome_content_renderer_client.h",
+diff -ruN a/chrome/renderer/chrome_content_renderer_client.cc b/chrome/renderer/chrome_content_renderer_client.cc
+--- a/chrome/renderer/chrome_content_renderer_client.cc
++++ b/chrome/renderer/chrome_content_renderer_client.cc
+@@ -1488,7 +1488,10 @@
+ 
+ void ChromeContentRendererClient::RunScriptsAtDocumentStart(
+     content::RenderFrame* render_frame) {
+-  sedo::FeedBlockerAgent::Install(render_frame);
++  sedo::FeedBlockerAgent::Install(
++      render_frame,
++      !chrome_observer_ ||
++          chrome_observer_->GetDynamicParams()->sedo_short_form_video);
+ #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
+   extensions::ExtensionsRendererClient::Get()->RunScriptsAtDocumentStart(
+       render_frame);

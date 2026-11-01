@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+*.log
+.pnpm-store/
+
+# Browser checkout and compile output
+apps/browser/build/
+apps/browser/.inbase/
+.inbase/
